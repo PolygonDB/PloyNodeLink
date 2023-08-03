@@ -9,7 +9,7 @@ class localdb{
     // start the database process as a child process and attach to it
     switch (os.platform()) {
         case 'win32':
-            this.db = fork(path.join(polyDBPath,'polygonDB.exe'));
+            this.db = exec(path.join(polyDBPath,'polygonDB.exe'));
             break;
         case 'linux':
             this.db = spawn(path.join(polyDBPath,'polygonDB'));
@@ -24,16 +24,15 @@ class localdb{
     
   }
     getversion = async function(){
-        var db = this.db
+        const db = this.db
         return new Promise(function (resolve, reject) {
-            
-            
-            // db.stdout.on('data', (data) => {
-            // var output = data.toString().split("\n")[0]
-            //     resolve(output)
-            //     // remove the listener
-            //     db.stdout.removeAllListeners('data')
-            // })
+            db.stdin.end(`{"action":"version"}\n`)
+            db.stdout.on('data', (data) => {
+            var output = data.toString().split("\n")[0]
+            // remove the listener
+            db.stdout.removeAllListeners('data')
+                resolve(output)
+            });
         })
         }
     remove = async function(table,row){
